@@ -20,11 +20,15 @@ app.use(express.urlencoded({
     limit: '30mb',
     extended: true
 }))
+
+app.get('/', (req, res) => {
+    res.send('Hello to Memories API')
+})
 // app.use('/public', express.static(path.join(__dirname), 'uploads'))
 
 // init routes
 route(app)
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 4000, () => {
     console.log(`Server is working at http://localhost:${process.env.PORT}`);
 })

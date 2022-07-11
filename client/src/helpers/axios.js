@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosIntance = axios.create({
-    baseURL: ' http://localhost:4000/api/v1/',
+    baseURL: ' https://memoriespj-server.herokuapp.com/api/v1/',
 });
 
 
