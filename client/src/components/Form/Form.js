@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { Button, Paper, TextField, Typography } from "@material-ui/core";
 
 import FileBase from 'react-file-base64'
 import useStyles from "./style";
-import { useDispatch } from "react-redux";
-import { createPost } from "../../actions";
+import { useDispatch, useSelector } from "react-redux";
+import { createPost, updatePost } from "../../actions";
 
-const Form = (props) => {
+const Form = ({ currentId, setCurrentId }) => {
     const dispatch = useDispatch()
+    const post  = useSelector(state => currentId ? state.posts.posts.find(post => post._id === currentId) : null)
     const classes = useStyles();
     const [postData, setPostData] = useState({
         creator: "",
@@ -18,9 +19,19 @@ const Form = (props) => {
         selectedFile: "",
     });
 
+    useEffect(() => {
+        if (post) setPostData(post)
+    }, [post])
+
+
     const handleSubmit = (e) => {
         e.preventDefault()
-        dispatch(createPost(postData))
+        if (currentId) {
+            dispatch(updatePost(currentId, postData))
+        } else {
+            dispatch(createPost(postData))
+        }
+        handleClear()
     };
 
     const handleOnChange = (e) => {
@@ -28,10 +39,15 @@ const Form = (props) => {
         setPostData({ ...postData, [name]: value });
     };
 
-    console.log(postData)
-
     const handleClear = () => {
-
+        setCurrentId(null)
+        setPostData({
+            creator: "",
+            title: "",
+            message: "",
+            tags: "",
+            selectedFile: "",
+        })
     }
     return (
         <Paper className={classes.paper}>
@@ -41,7 +57,7 @@ const Form = (props) => {
                 className={`${classes.form} ${classes.root}`}
                 onSubmit={handleSubmit}
             >
-                <Typography variant="h6">Creating a Memory</Typography>
+                <Typography variant="h6">{currentId ? 'Edit' : 'Creating'} a Memory</Typography>
                 <TextField
                     name="creator"
                     variant="outlined"
@@ -72,7 +88,7 @@ const Form = (props) => {
                     label="Tags"
                     fullWidth
                     value={postData.tags}
-                    onChange={handleOnChange}
+                    onChange={(e) => setPostData({...postData, tags: e.target.value.split(',')})}
                 />
                 <div className={classes.fileInput}>
                     <FileBase
@@ -82,12 +98,15 @@ const Form = (props) => {
                     />
                 </div>
                 <Button className={classes.buttonSubmit} variant='contained' color='primary' size='large' type='submit' fullWidth>Submit</Button>
-                <Button variant='contained' color='secondary' size='small' type='submit' fullWidth onClick={handleClear}>Clear</Button>
+                <Button variant='contained' color='secondary' size='small' fullWidth onClick={handleClear}>Clear</Button>
             </form>
         </Paper>
     );
 };
 
-Form.propTypes = {};
+Form.propTypes = {
+    currentId: PropTypes.number,
+    setCurrentId: PropTypes.func
+};
 
 export default Form;
