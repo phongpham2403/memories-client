@@ -6,13 +6,15 @@ import FileBase from 'react-file-base64'
 import useStyles from "./style";
 import { useDispatch, useSelector } from "react-redux";
 import { createPost, updatePost } from "../../actions";
+import { useNavigate } from "react-router-dom";
 
 const Form = ({ currentId, setCurrentId }) => {
     const dispatch = useDispatch()
-    const post  = useSelector(state => currentId ? state.posts.posts.find(post => post._id === currentId) : null)
+    const navigate = useNavigate()
+    const user = JSON.parse(localStorage.getItem('profile'))
+    const post = useSelector(state => currentId ? state.posts.posts.find(post => post._id === currentId) : null)
     const classes = useStyles();
     const [postData, setPostData] = useState({
-        creator: "",
         title: "",
         message: "",
         tags: "",
@@ -27,30 +29,41 @@ const Form = ({ currentId, setCurrentId }) => {
     const handleSubmit = (e) => {
         e.preventDefault()
         if (currentId) {
-            dispatch(updatePost(currentId, postData))
+            dispatch(updatePost(currentId, { ...postData, name: user?.result?.name }))
         } else {
-            dispatch(createPost(postData))
+            dispatch(createPost({ ...postData, name: user?.result?.name }, navigate))
         }
         handleClear()
     };
 
     const handleOnChange = (e) => {
-        const {name, value} = e.target
+        const { name, value } = e.target
         setPostData({ ...postData, [name]: value });
     };
 
     const handleClear = () => {
         setCurrentId(null)
         setPostData({
-            creator: "",
             title: "",
             message: "",
             tags: "",
             selectedFile: "",
         })
     }
+
+
+    if (!user?.result?.name) {
+        return (
+            <Paper className={classes.paper}>
+                <Typography variant="h6" align="center">
+                    Please Sign In to create your own memories and like other's memories.
+                </Typography>
+            </Paper>
+        );
+    }
+
     return (
-        <Paper className={classes.paper}>
+        <Paper className={classes.paper} elevation={6}>
             <form
                 autoComplete="off"
                 noValidate
@@ -58,14 +71,6 @@ const Form = ({ currentId, setCurrentId }) => {
                 onSubmit={handleSubmit}
             >
                 <Typography variant="h6">{currentId ? 'Edit' : 'Creating'} a Memory</Typography>
-                <TextField
-                    name="creator"
-                    variant="outlined"
-                    label="Creator"
-                    fullWidth
-                    value={postData.creator}
-                    onChange={handleOnChange}
-                />
                 <TextField
                     name="title"
                     variant="outlined"
@@ -88,13 +93,13 @@ const Form = ({ currentId, setCurrentId }) => {
                     label="Tags"
                     fullWidth
                     value={postData.tags}
-                    onChange={(e) => setPostData({...postData, tags: e.target.value.split(',')})}
+                    onChange={(e) => setPostData({ ...postData, tags: e.target.value.split(',') })}
                 />
                 <div className={classes.fileInput}>
                     <FileBase
                         type='file'
                         mutiple={false}
-                        onDone={({base64}) => setPostData({...postData, selectedFile: base64})}
+                        onDone={({ base64 }) => setPostData({ ...postData, selectedFile: base64 })}
                     />
                 </div>
                 <Button className={classes.buttonSubmit} variant='contained' color='primary' size='large' type='submit' fullWidth>Submit</Button>

@@ -1,8 +1,15 @@
 import axios from 'axios';
 
 const axiosIntance = axios.create({
-    baseURL: ' https://memoriespj-server.herokuapp.com/api/v1/',
+    baseURL: ' http://localhost:4000/api/v1/',
 });
 
+axiosIntance.interceptors.request.use((req) => {
+    if(localStorage.getItem('profile')){
+        req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('profile')).token}`;
+    }
+    
+    return req;
+})
 
 export default axiosIntance
