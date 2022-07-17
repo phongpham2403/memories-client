@@ -69,7 +69,19 @@ const postReducer = (state = initState, action) => {
                 ...state,
                 isLoading: false,
                 posts: updatedState
-            }  
+            } 
+        case postConstants.COMMENT_POST: 
+            return state = {
+                ...state,
+                isLoading: false,
+                posts: state.posts.map((post) => {
+                    if (post._id === action.payload._id) {
+                        return action.payload;
+                    }
+                    return post;
+                }),
+            }
+        
         case postConstants.DELETE_POSTS_REQUEST:
             return state = {
                 ...state,

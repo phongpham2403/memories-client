@@ -26,6 +26,17 @@ class PostsController {
         }
     }
 
+    async getPostsBySearch(req, res) {
+        const { searchQuery, tags } = req.query
+        try {
+            const title = new RegExp(searchQuery, "i");
+            const posts = await Post.find({ $or: [{ title }, { tags: { $in: tags.split(',') } }] });
+            return res.status(200).json(posts)
+        } catch (error) {
+            return res.status(404).json({ message: error.message })
+        }
+    }
+
     async createPost(req, res) {
         const post = req.body
         const newPost = new Post({ ...post, creator: req.userId, createdAt: new Date().toISOString() })
@@ -83,16 +94,24 @@ class PostsController {
         }
     }
 
-    async getPostsBySearch(req, res) {
-        const { searchQuery, tags } = req.query
+    async commentPost(req, res) {
         try {
-            const title = new RegExp(searchQuery, "i");
-            const posts = await Post.find({ $or: [{ title }, { tags: { $in: tags.split(',') } }] });
-            return res.status(200).json(posts)
+            const { id } = req.params;
+            const { value } = req.body;
+        
+            const post = await Post.findById(id);
+        
+            post.comments.push(value);
+        
+            const updatedPost = await Post.findByIdAndUpdate(id, post, { new: true });
+        
+            return res.status(200).json(updatedPost)
+
         } catch (error) {
-            return res.status(404).json({ message: error.message })
+            return res.status(409).json({ message: error.message })
         }
     }
+    
 }
 
 module.exports = new PostsController

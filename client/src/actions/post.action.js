@@ -147,6 +147,25 @@ export const likePost = (id) => {
     };
 };
 
+export const commentPost = (value, id) => {
+    return async (dispatch) => {
+        try {
+            const res = await axios.post(`posts/${id}/comment`, { value });
+            if (res.status === 200) {
+                dispatch({ 
+                    type: postConstants.COMMENT_POST,
+                    payload: res.data,
+                });
+            } else {
+                
+            }
+            return res.data.comments
+        } catch (error) {
+            console.log(error);
+        }
+    };
+};
+
 
 
 

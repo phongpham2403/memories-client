@@ -12,5 +12,6 @@ router.get("/:id", auth, postsController.getPost);
 router.patch("/:id/update", auth, postsController.updatePost);
 router.delete("/:id/delete", auth, postsController.deletePost);
 router.patch("/:id/like", auth, postsController.likePost);
+router.post("/:id/comment", auth, postsController.commentPost);
 
 module.exports = router;

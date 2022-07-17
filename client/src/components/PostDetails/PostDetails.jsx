@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { getPost, getPostsBySearch } from '../../actions';
+import CommentSection from './CommentSection/CommentSection';
 // import CommentSection from './CommentSection';
 import useStyles from './style';
 
@@ -44,14 +45,14 @@ const PostDetails = props => {
                 <div className={classes.card}>
                     <div className={classes.section}>
                         <Typography variant="h3" component="h2">{post.title}</Typography>
-                        <Typography gutterBottom variant="h6" color="textSecondary" component="h2">{post.tags.map((tag) => `#${tag} `)}</Typography>
+                        <Typography gutterBottom variant="h6" color="textSecondary" component="h2">{post?.tags?.map((tag) => `#${tag} `)}</Typography>
                         <Typography gutterBottom variant="body1" component="p">{post.message}</Typography>
                         <Typography variant="h6">Created by: {post.name}</Typography>
                         <Typography variant="body1">{moment(post.createdAt).fromNow()}</Typography>
                         <Divider style={{ margin: '20px 0' }} />
                         <Typography variant="body1"><strong>Realtime Chat</strong></Typography>
                         <Divider style={{ margin: '20px 0' }} />
-                        {/* <CommentSection post={post} /> */}
+                        <CommentSection post={post} />
                         <Divider style={{ margin: '20px 0' }} />
                     </div>
                     <div className={classes.imageSection}>
